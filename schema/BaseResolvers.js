@@ -3,7 +3,6 @@ const dbAdapter = require('../db/DatabaseAdapter')
 
 const resolvers = {
   Query: {
-    hello: () => 'Hello world!',
     getEntry: (root, { entry }, context, info) => {
 
     },
@@ -32,6 +31,10 @@ const resolvers = {
       const doc = await dbAdapter.insertDoc('sites', { ...site })
       //console.log(await dbAdapter.getDoc('sites', doc))
       return await dbAdapter.getDoc('sites', site)
+    },
+
+    createToken: (root, { username, password }) => {
+      return (Math.random() - 0.5) > 0 ? { reason: "MATH FAILED", code: "e404", status: 'ERROR' } : { data: "S3cretT0k3n", code: "e200"}
     }
   },
 
@@ -43,11 +46,8 @@ const resolvers = {
     },
 
     site: async (root, args, context, info) => {
-      //console.log(root, args, context, info)
       const name = root.site.siteName
-      //console.log(await dbAdapter.getDoc('sites', { siteName: name }))
       const data = await dbAdapter.getDoc('sites', {  siteName: name })
-      //console.log(data)
       return data
     },
 
@@ -57,10 +57,20 @@ const resolvers = {
       if(root.zone) return root.zone
       const { zone } = await dbAdapter.getDoc("entries", root)
       return zone
-    }
+    },
+
   },
 
 
+  Result: {
+    __resolveType: (root, context, info) => {
+      if(root.reason) {
+        return 'Error'
+      } else {
+        return 'Token'
+      }
+    }
+  }
 };
 
 module.exports = resolvers

@@ -7,8 +7,6 @@ const { ApolloServer } = require('apollo-server');
 
 const DatabaseAdapter = require('./db/DatabaseAdapter')
 
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
 
 
 const debug = require('debug')('limpet:server');
@@ -48,9 +46,9 @@ class Application {
   }
   logger() {
     this.log = {
-      info: (...e) =>  console.log(e),
-      error: (...e) => console.error(e),
-      fatal: (...e) => console.error(e)
+      info: (...e) =>  console.log(...e),
+      error: (...e) => console.error(...e),
+      fatal: (...e) => console.error(...e)
     }
   }
   config() {}
@@ -65,8 +63,8 @@ class Application {
   }
 
   gql() {
-    const { typeDefs, resolvers } = require('./schema/SpeciesGQL')
-    this.server = new ApolloServer({ typeDefs, resolvers })
+    const schema = require('./schema/SpeciesGQL')
+    this.server = new ApolloServer({ schema })
     //console.log(this.server)
     this.server.playgroundOptions.settings['editor.cursorShape'] = 'block'
   }

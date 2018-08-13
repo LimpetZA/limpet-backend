@@ -1,0 +1,6 @@
+type Mutation {
+  addSpecies(name: String!): Species
+  addEntry(entry: EntryInput!): Entry
+  addSite(site: SiteInput!): Site
+  createToken(username: String!, password: String!): Result!
+}

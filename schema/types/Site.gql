@@ -1,0 +1,9 @@
+type Site {
+  siteName: String!
+  location: String
+}
+
+input SiteInput {
+  siteName: String!
+  location: String
+}

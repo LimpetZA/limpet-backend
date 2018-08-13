@@ -1,0 +1,22 @@
+type Entry {
+  _id: ID
+  site: Site!
+  zone: Zone!
+  date: Date
+  observers: [String]
+  species: Species!
+  scribe: String
+  count: Int
+  comments: String
+}
+
+input EntryInput {
+  site: SiteInput
+  zone: String!
+  date: Int
+  observers: [String]
+  species: String!
+  scribe: String
+  count: Int
+  comments: String
+}

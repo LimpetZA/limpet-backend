@@ -1,0 +1,5 @@
+type Token {
+  data: String!
+  expiry: Date
+  code: Code
+}

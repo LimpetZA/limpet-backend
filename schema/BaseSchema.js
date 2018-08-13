@@ -2,6 +2,12 @@ const { gql } = require('apollo-server-express');
 
 // Construct a schema, using GraphQL schema language
 const typeDefs = gql`
+
+  schema {
+    query: Query
+    mutation: Mutation
+  }
+
   type Query {
     getEntry(name: String!): Entry
     getAllEntries: [Entry]
@@ -12,11 +18,25 @@ const typeDefs = gql`
     addSpecies(name: String!): Species
     addEntry(entry: EntryInput!): Entry
     addSite(site: SiteInput!): Site
+
+    createToken(username: String!, password: String!): Result!
+
   }
 
-  mutation addSpecies($name: String!) {
-    species: Species
+  union Result = Token | Error
+
+  scalar Date
+
+  type Error {
     status: Status
+    reason: String!
+    code: Code
+  }
+
+  type Token {
+    data: String!
+    expiry: Date
+    code: Code
   }
 
   input EntryInput {
@@ -40,6 +60,12 @@ const typeDefs = gql`
     ERROR
   }
 
+  enum Code {
+    e200
+    e400
+    e404
+  }
+
   enum Zone {
     HIGH
     MID
@@ -57,17 +83,26 @@ const typeDefs = gql`
   }
 
   type Entry {
+    _id: ID
     site: Site!
     zone: Zone!
     """
     Date is unix time
     """
-    date: Int
+    date: Date
     observers: [String]
     species: Species!
     scribe: String
     count: Int
     comments: String
+  }
+
+  type User {
+    _id: ID
+    username: String!
+    email: String!
+    firstName: String
+    lastName: String
   }
 `;
 

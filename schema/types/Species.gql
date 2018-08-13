@@ -1,0 +1,4 @@
+type Species {
+  id: ID
+  name: String!
+}
