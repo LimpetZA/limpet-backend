@@ -1,23 +1,21 @@
 'use strict'
-const NodeCouchDb = require('node-couchdb');
 
-
+const NodeCouchDb = require('node-couchdb')
+const nano = require('nano')
+const MongoClient = require('mongodb').MongoClient
+const uuid = require('uuid/v4')
 
 class DatabaseAdapter {
-  constructor(databaseName) {
-    this.couch = new NodeCouchDb()
-    Object.defineProperty(this, 'db', { value: null, writable: true})
-    Object.defineProperty(this, 'databaseName', { value: databaseName, enumerable: false, writable: false, configurable: false })
+  constructor() {
+    this.url = 'mongodb://localhost:27017'
+    Object.defineProperty(this, 'db', { value: null, writable: true, enumerable: false})
   }
 
-  async init() {
-    const { couch, db } = this
-    this.db = await couch.listDatabases().then(dbs => dbs.filter((v) => v.databaseName !== this.databaseName))
+  async init(databaseName) {
+    const { url } = this
+    Object.defineProperty(this, 'databaseName', { value: databaseName, enumerable: false, writable: false, configurable: false })
 
-    //does the db even exist?
-    if (this.db.length === 0) {
-      this.db = await couch.createDatabase(this.databaseName)
-    }
+    this.db = (await MongoClient.connect(url, { useNewUrlParser: true })).db(databaseName)
 
     return this.db
   }
@@ -26,39 +24,28 @@ class DatabaseAdapter {
 
   }
 
-  async getDoc(id) {
-    return await this.couch.get(this.databaseName, id)
+  async getDoc(collectionName, query) {
+    const { db } = this
+    const col = db.collection(collectionName)
+    const docs = await col.findOne(query)
+    return docs
   }
 
-  async getDocsByField(field, value, optionalFields) {
-    if(!optionalFields) optionalFields = []
-    const query = {
-      selector: {
-        [field]: value
-      },
-      fields: [field, "_id", ...optionalFields],
-    }
-
-    return await this.couch.mango(this.databaseName, query)
+  async getDocs(collectionName, query) {
+    const { db } = this
+    const col = db.collection(collectionName)
+    const docs = await col.find(query)
+    return docs
   }
 
-  async getDocsBySel(selector, fields) {
-    const query = {
-      selector,
-      fields
-    }
-
-    return await this.couch.mango(this.databaseName, query)
-  }
-
-  async insertDoc(id,  fields) {
-    const { data, headers, status } = await this.couch.insert(this.databaseName, {
-      _id: id,
-      ...fields
+  async insertDoc(collectionName, data) {
+    const { db } = this
+    const col = db.collection(collectionName)
+    const id = uuid()
+    return await col.insertOne({
+     // _id: id,
+      ...data
     })
-
-    console.log(data, status)
-    return { data, status }
   }
 
   async updateDoc(id,  fields) {
@@ -72,8 +59,8 @@ class DatabaseAdapter {
   }
 
   async genID() {
-    return await this.couch.uniqid().then(ids => ids[0])
+    return uuid()
   }
 }
 
-module.exports = DatabaseAdapter
+module.exports = new DatabaseAdapter()

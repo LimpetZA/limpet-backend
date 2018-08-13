@@ -1,12 +1,14 @@
 // Provide resolver functions for your schema fields
-const dbAdapter = new (require('../db/DatabaseAdapter'))('limpet_dev_server')
+const dbAdapter = require('../db/DatabaseAdapter')
 
 const resolvers = {
   Query: {
     hello: () => 'Hello world!',
-    getEntry: (root, { id }) => {
+    getEntry: (root, { entry }, context, info) => {
 
-    }
+    },
+    getAllEntries: async () => (await dbAdapter.getDocs('entries', {})).toArray()
+    
   },
 
   Mutation: {
@@ -19,20 +21,17 @@ const resolvers = {
       const { site, zone, date, observers, species, count, comments } = entry
       const { siteName, location } = site
 
-      const id = await dbAdapter.genID()
-      const doc = await dbAdapter.insertDoc(id, { ...entry, type: "entry" })
-      //console.log((await dbAdapter.getDoc(id)).data)
-      return {...(await dbAdapter.getDoc(id)).data, id}
+      const doc = await dbAdapter.insertDoc('entries', {  site, zone, date, observers, species, count, comments })
+      //console.log(doc)
+      return await dbAdapter.getDoc('entries', entry)
     },
 
     addSite: async (root, { site }) => {
       const { name } = site
 
-
-      const id = await dbAdapter.genID()
-      const doc = await dbAdapter.insertDoc(id, { ...site, type: "site" })
-      console.log((await dbAdapter.getDoc(id)).data)
-      return (await dbAdapter.getDoc(id)).data
+      const doc = await dbAdapter.insertDoc('sites', { ...site })
+      //console.log(await dbAdapter.getDoc('sites', doc))
+      return await dbAdapter.getDoc('sites', site)
     }
   },
 
@@ -45,19 +44,19 @@ const resolvers = {
 
     site: async (root, args, context, info) => {
       //console.log(root, args, context, info)
-      const name = info.variableValues.siteName
-      const { data } = await dbAdapter.getDocsBySel({ "site": { "siteName": name } }, ["_id", "site"])
-      let site = data.docs
-      if(site.length && site.length > 1) {
-        site = site[0]
-      }
-      console.log(data)
-      return site
+      const name = root.site.siteName
+      //console.log(await dbAdapter.getDoc('sites', { siteName: name }))
+      const data = await dbAdapter.getDoc('sites', {  siteName: name })
+      //console.log(data)
+      return data
     },
 
     zone: async (root, args, context, info) => {
       const id = root.id
-      const { data } = await dbAdapter.getDocsByField("site", info.variableValues.siteName, ["siteName", "location"])
+      console.log(root.zone)
+      if(root.zone) return root.zone
+      const { zone } = await dbAdapter.getDoc("entries", root)
+      return zone
     }
   },
 

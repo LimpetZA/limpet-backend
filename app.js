@@ -56,10 +56,11 @@ class Application {
   config() {}
 
   async database() {
-    this.dbAdapter = new DatabaseAdapter("limpet_dev_server")
-    //console.log(await this.dbAdapter.init())
+    this.dbAdapter = DatabaseAdapter
+    await this.dbAdapter.init("limpet_dev_server")
+    //console.log()
     //await this.dbAdapter.insertDoc("test_doc", { "Some": "fucken", really: ["cool", "data"] })
-    const docs = await this.dbAdapter.getDocsByField("site", "Brakpan")
+    // const docs = await this.dbAdapter.insertDoc("sites", { siteName: "Brakpan", location: "fokol" })
     //console.log(docs.data)
   }
 

@@ -4,6 +4,7 @@ const { gql } = require('apollo-server-express');
 const typeDefs = gql`
   type Query {
     getEntry(name: String!): Entry
+    getAllEntries: [Entry]
     hello: String
   }
 
