@@ -7,7 +7,6 @@ const queries = require('./queries')
 
 const resolvers = require('./resolvers')
 
-const baseResolvers = require('./BaseResolvers')
 const { makeExecutableSchema } = require('graphql-tools')
 
 
