@@ -15,7 +15,18 @@ input EntryInput {
   zone: String!
   date: Int
   observers: [String]
-  species: String!
+  species: SpeciesInput!
+  scribe: String
+  count: Int
+  comments: String
+}
+
+input EntryQuery {
+  site: SiteInput
+  zone: String
+  date: Int
+  observers: [String]
+  species: SpeciesInput
   scribe: String
   count: Int
   comments: String

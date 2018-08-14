@@ -1,4 +1,8 @@
 type Species {
-  id: ID
+  _id: ID
+  name: String!
+}
+
+input SpeciesInput {
   name: String!
 }

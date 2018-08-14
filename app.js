@@ -6,7 +6,7 @@ const sassMiddleware = require('node-sass-middleware');
 const { ApolloServer } = require('apollo-server');
 
 const DatabaseAdapter = require('./db/DatabaseAdapter')
-
+const context = require('./schema/Context')
 
 
 const debug = require('debug')('limpet:server');
@@ -64,7 +64,7 @@ class Application {
 
   gql() {
     const schema = require('./schema/SpeciesGQL')
-    this.server = new ApolloServer({ schema })
+    this.server = new ApolloServer({ schema, context})
     //console.log(this.server)
     this.server.playgroundOptions.settings['editor.cursorShape'] = 'block'
   }

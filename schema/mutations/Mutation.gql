@@ -1,5 +1,5 @@
 type Mutation {
-  addSpecies(name: String!): Species
+  addSpecies(species: SpeciesInput!): Species
   addEntry(entry: EntryInput!): Entry
   addSite(site: SiteInput!): Site
   createToken(username: String!, password: String!): Result!

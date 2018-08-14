@@ -1,9 +1,9 @@
 'use strict'
 
-const NodeCouchDb = require('node-couchdb')
-const nano = require('nano')
 const MongoClient = require('mongodb').MongoClient
 const uuid = require('uuid/v4')
+
+const Session = require('../components/Session')
 
 class DatabaseAdapter {
   constructor() {
@@ -20,8 +20,23 @@ class DatabaseAdapter {
     return this.db
   }
 
-  async initViews() {
+  async getSession(token) {
+    const { db } = this
+    let session = {}
 
+    const sessionCol = db.collection('session')
+    let sessionDoc = await sessionCol.findOne({ token })
+
+    if(sessionDoc) {
+      session = new Session(sessionDoc)
+
+      if(session.expired()) {
+        await sessionCol.findOneAndDelete({token}, {})
+        session = { status: Session.status.EXPIRED }
+      }
+    }
+
+    return { session }
   }
 
   async getDoc(collectionName, query) {
@@ -33,8 +48,9 @@ class DatabaseAdapter {
 
   async getDocs(collectionName, query) {
     const { db } = this
+    //const 
     const col = db.collection(collectionName)
-    const docs = await col.find(query)
+    const docs = await col.find(query).toArray()
     return docs
   }
 

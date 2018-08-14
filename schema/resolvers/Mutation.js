@@ -2,17 +2,19 @@ const dbAdapter = require('../../db/DatabaseAdapter')
 
 module.exports = {
   Mutation: {
-    addSpecies: async (root, { name }) => {
+    addSpecies: async (root, { species }) => {
       //console.log(name)
-      const doc = await dbAdapter.getDoc('species', { name })
+      const doc = await dbAdapter.getDoc('species', { name: species.name })
 
       if(doc) {
-        return { ...doc }
+        console.log(doc)
+        return { ...doc, id: doc._id }
       }
 
-      const operations = await dbAdapter.insertDoc('species', { name }).ops
-      const id = operations[0]._id
-      return { name,  id }
+      const operations = await dbAdapter.insertDoc('species', { name: species.name  }).ops
+      //const id = operations[0]._id
+      console.log(species.name)
+      return { name: species.name, id: operations[0]._id }
     },
 
     addEntry: async (root, { entry }) => {
@@ -28,7 +30,7 @@ module.exports = {
       const { name } = site
 
       const doc = await dbAdapter.insertDoc('sites', { ...site })
-      //console.log(await dbAdapter.getDoc('sites', doc))
+      
       return await dbAdapter.getDoc('sites', site)
     },
 

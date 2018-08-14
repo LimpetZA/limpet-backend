@@ -2,10 +2,18 @@ const dbAdapter = require('../../db/DatabaseAdapter')
 
 module.exports = {
   Query: {
-    getEntry: (root, { entry }, context, info) => {
-
+    getEntries: async (root, { entryQuery }, context, info) => {
+      let docs = await dbAdapter.getDocs('entries', entryQuery)
+      console.log(entryQuery)
+      return docs
     },
-    getAllEntries: async () => (await dbAdapter.getDocs('entries', {})).toArray()
 
+    getAllEntries: async (root, _, context) =>  {
+      let docs = await dbAdapter.getDocs('entries', {})
+      let { session } = context
+      //console.log(docs)
+
+      return docs
+    }
   },
 }

@@ -1,4 +1,5 @@
 type Site {
+  _id: ID
   siteName: String!
   location: String
 }

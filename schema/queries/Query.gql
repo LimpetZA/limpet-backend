@@ -1,4 +1,4 @@
 type Query {
-  getEntry(name: String!): Entry
+  getEntries(entryQuery: EntryQuery!): [Entry]
   getAllEntries: [Entry]
 }
